@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 
-export const ai = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
-const MODEL = 'gemini-2.5-flash';
+const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
+const MODEL_NAME = 'gemini-2.5-flash';
 
 export type Source = {
   id: string;
@@ -31,6 +31,7 @@ export type LuminaResult = {
 };
 
 export async function processResearch(sources: Source[]): Promise<LuminaResult> {
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
   const sourcesText = sources.map(s => `SOURCE [${s.id}]: ${s.content}`).join('\n\n');
 
   const prompt = `You are Lumina, a Cognitive Load Balancer. Analyze the following information snippets from multiple sources.
@@ -63,12 +64,13 @@ Respond ONLY with a JSON object:
   }
 }`;
 
-  const res = await ai.getGenerativeModel({ model: MODEL }).generateContent({
+  const res = await model.generateContent({
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
     generationConfig: { responseMimeType: 'application/json' }
   });
 
-  const rawData = JSON.parse(res.response.text() || "{}");
+  const responseText = res.response.text();
+  const rawData = JSON.parse(responseText || "{}");
 
   // Format TensionPoints correctly with the original Claim objects (simulated from text)
   const tensionPoints: TensionPoint[] = rawData.tensionPoints.map((tp: any) => ({
