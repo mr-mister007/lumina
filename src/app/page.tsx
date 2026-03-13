@@ -77,20 +77,32 @@ export default function Lumina() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       
-      // Convert result to ReactFlow format with a more structured layout
-      const nodes: Node[] = data.graphNodes.map((n: any, idx: number) => ({
-        id: n.id,
-        type: 'default',
-        data: { label: n.label },
-        // Simple force-directed-like layout calculation
-        position: { 
-          x: 200 + 350 * Math.cos(idx * 2 * Math.PI / data.graphNodes.length), 
-          y: 200 + 350 * Math.sin(idx * 2 * Math.PI / data.graphNodes.length) 
-        },
-        className: n.type === 'source' 
-          ? 'bg-amber-500/20 border-2 border-amber-500/50 text-amber-500 font-bold p-4 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.2)]' 
-          : 'bg-emerald-500/5 border border-emerald-500/30 text-emerald-100 p-4 rounded-2xl border text-sm w-64 text-center shadow-lg backdrop-blur-sm',
-      }));
+      // Convert result to ReactFlow format with a more structured and spaced-out layout
+      const sourceNodes = data.graphNodes.filter((n: any) => n.type === 'source');
+      const claimNodes = data.graphNodes.filter((n: any) => n.type === 'claim');
+
+      const nodes: Node[] = [
+        ...sourceNodes.map((n: any, idx: number) => ({
+          id: n.id,
+          type: 'input',
+          data: { label: n.label },
+          position: { 
+            x: 0, 
+            y: idx * 250 
+          },
+          className: 'bg-amber-500/10 border-2 border-amber-500/50 text-amber-500 font-bold p-6 rounded-full shadow-[0_0_30px_rgba(245,158,11,0.2)] w-40 h-40 flex items-center justify-center text-center',
+        })),
+        ...claimNodes.map((n: any, idx: number) => ({
+          id: n.id,
+          type: 'default',
+          data: { label: n.label },
+          position: { 
+            x: 600 + (idx % 2 === 0 ? 0 : 300), 
+            y: idx * 150 
+          },
+          className: 'bg-emerald-500/5 border border-emerald-500/30 text-emerald-100 p-6 rounded-3xl border text-sm w-72 text-center shadow-xl backdrop-blur-md hover:border-emerald-500/60 transition-colors',
+        }))
+      ];
 
       const edges: Edge[] = data.graphEdges.map((e: any) => ({
         id: `${e.source}-${e.target}`,
@@ -98,11 +110,12 @@ export default function Lumina() {
         target: e.target,
         label: e.label,
         animated: true,
-        labelStyle: { fill: '#9ca3af', fontSize: 10, fontWeight: 600 },
-        labelBgPadding: [4, 2],
-        labelBgBorderRadius: 4,
-        labelBgStyle: { fill: '#0a0a0b', fillOpacity: 0.8 },
-        style: { stroke: '#10b981', strokeWidth: 1.5, opacity: 0.5 },
+        type: 'smoothstep',
+        labelStyle: { fill: '#9ca3af', fontSize: 11, fontWeight: 600 },
+        labelBgPadding: [6, 4],
+        labelBgBorderRadius: 8,
+        labelBgStyle: { fill: '#111827', fillOpacity: 0.9 },
+        style: { stroke: '#10b981', strokeWidth: 2, opacity: 0.6 },
         markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' },
       }));
 
@@ -268,22 +281,22 @@ export default function Lumina() {
             </div>
 
             {/* Knowledge Graph Section */}
-            <section className="bg-neutral-900/40 border border-neutral-800 rounded-[2.5rem] h-[650px] shadow-2xl overflow-hidden relative group">
+            <section className="bg-neutral-900/40 border border-neutral-800 rounded-[2.5rem] h-[750px] shadow-2xl overflow-hidden relative group">
               <div className="absolute top-6 left-8 z-10">
                 <h3 className="text-2xl font-bold flex items-center gap-3 text-emerald-400">
                   <GitBranch className="w-6 h-6" />
                   Knowledge Graph
                 </h3>
-                <p className="text-xs text-neutral-500 mt-1">Interactive visualization of claims and connections</p>
+                <p className="text-xs text-neutral-500 mt-1">Left: Sources | Right: Synthesized Claims</p>
               </div>
               <ReactFlow
                 nodes={result.nodes}
                 edges={result.edges}
                 fitView
                 className="bg-transparent"
-                onInit={(instance) => instance.fitView()}
+                onInit={(instance) => setTimeout(() => instance.fitView(), 100)}
               >
-                <Background color="#1f2937" gap={20} />
+                <Background color="#1f2937" gap={24} size={1} />
                 <Controls className="bg-neutral-800 border-none rounded-lg overflow-hidden shadow-lg" />
               </ReactFlow>
             </section>
