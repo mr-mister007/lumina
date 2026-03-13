@@ -1,6 +1,6 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const MODEL_NAME = 'gemini-2.5-flash';
+const MODEL_NAME = 'gemini-1.5-flash'; // Switching to stable 1.5 flash to avoid 2.5 quota issues
 
 export type Source = {
   id: string;
@@ -30,7 +30,7 @@ export type LuminaResult = {
 };
 
 export async function processResearch(sources: Source[]): Promise<LuminaResult> {
-  const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
   const sourcesText = sources.map(s => `SOURCE [${s.id}]: ${s.content}`).join('\n\n');
 
@@ -73,7 +73,7 @@ Respond ONLY with a JSON object:
   const rawData = JSON.parse(responseText || "{}");
 
   // Format TensionPoints correctly with the original Claim objects (simulated from text)
-  const tensionPoints: TensionPoint[] = rawData.tensionPoints.map((tp: any) => ({
+  const tensionPoints: TensionPoint[] = (rawData.tensionPoints || []).map((tp: any) => ({
     claimA: { id: `a-${Math.random()}`, sourceId: tp.sourceAId, text: tp.claimA, category: 'fact', confidence: 1 },
     claimB: { id: `b-${Math.random()}`, sourceId: tp.sourceBId, text: tp.claimB, category: 'fact', confidence: 1 },
     explanation: tp.explanation
@@ -82,7 +82,7 @@ Respond ONLY with a JSON object:
   return {
     masterClaims: rawData.masterClaims || [],
     tensionPoints: tensionPoints,
-    graphNodes: rawData.graph.nodes || [],
-    graphEdges: rawData.graph.edges || []
+    graphNodes: rawData.graph?.nodes || [],
+    graphEdges: rawData.graph?.edges || []
   };
 }
