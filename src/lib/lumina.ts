@@ -1,6 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
 
-const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
 const MODEL_NAME = 'gemini-2.5-flash';
 
 export type Source = {
@@ -31,6 +30,7 @@ export type LuminaResult = {
 };
 
 export async function processResearch(sources: Source[]): Promise<LuminaResult> {
+  const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
   const sourcesText = sources.map(s => `SOURCE [${s.id}]: ${s.content}`).join('\n\n');
 
