@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const MODEL_NAME = 'gemini-1.5-flash'; // Switching to stable 1.5 flash to avoid 2.5 quota issues
+const MODEL_NAME = 'gemini-2.5-flash'; // Switching to stable 1.5 flash to avoid 2.5 quota issues
 
 export type Source = {
   id: string;

@@ -77,12 +77,19 @@ export default function Lumina() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       
-      // Convert result to ReactFlow format
+      // Convert result to ReactFlow format with a more structured layout
       const nodes: Node[] = data.graphNodes.map((n: any, idx: number) => ({
         id: n.id,
+        type: 'default',
         data: { label: n.label },
-        position: { x: Math.random() * 400, y: Math.random() * 400 },
-        className: n.type === 'source' ? 'bg-amber-500/10 border-amber-500/50 text-amber-500 font-bold p-2 rounded-lg' : 'bg-emerald-500/10 border-emerald-500/50 text-emerald-100 p-2 rounded-lg border text-xs w-48 text-center',
+        // Simple force-directed-like layout calculation
+        position: { 
+          x: 200 + 350 * Math.cos(idx * 2 * Math.PI / data.graphNodes.length), 
+          y: 200 + 350 * Math.sin(idx * 2 * Math.PI / data.graphNodes.length) 
+        },
+        className: n.type === 'source' 
+          ? 'bg-amber-500/20 border-2 border-amber-500/50 text-amber-500 font-bold p-4 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.2)]' 
+          : 'bg-emerald-500/5 border border-emerald-500/30 text-emerald-100 p-4 rounded-2xl border text-sm w-64 text-center shadow-lg backdrop-blur-sm',
       }));
 
       const edges: Edge[] = data.graphEdges.map((e: any) => ({
@@ -91,8 +98,12 @@ export default function Lumina() {
         target: e.target,
         label: e.label,
         animated: true,
-        style: { stroke: '#4b5563' },
-        markerEnd: { type: MarkerType.ArrowClosed, color: '#4b5563' },
+        labelStyle: { fill: '#9ca3af', fontSize: 10, fontWeight: 600 },
+        labelBgPadding: [4, 2],
+        labelBgBorderRadius: 4,
+        labelBgStyle: { fill: '#0a0a0b', fillOpacity: 0.8 },
+        style: { stroke: '#10b981', strokeWidth: 1.5, opacity: 0.5 },
+        markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' },
       }));
 
       setResult({ ...data, nodes, edges });
@@ -257,28 +268,30 @@ export default function Lumina() {
             </div>
 
             {/* Knowledge Graph Section */}
-            <section className="bg-neutral-900/40 border border-neutral-800 rounded-[2.5rem] h-[600px] shadow-2xl overflow-hidden relative">
+            <section className="bg-neutral-900/40 border border-neutral-800 rounded-[2.5rem] h-[650px] shadow-2xl overflow-hidden relative group">
               <div className="absolute top-6 left-8 z-10">
-                <h3 className="text-2xl font-bold flex items-center gap-3 text-indigo-400">
+                <h3 className="text-2xl font-bold flex items-center gap-3 text-emerald-400">
                   <GitBranch className="w-6 h-6" />
                   Knowledge Graph
                 </h3>
+                <p className="text-xs text-neutral-500 mt-1">Interactive visualization of claims and connections</p>
               </div>
               <ReactFlow
                 nodes={result.nodes}
                 edges={result.edges}
                 fitView
                 className="bg-transparent"
+                onInit={(instance) => instance.fitView()}
               >
                 <Background color="#1f2937" gap={20} />
-                <Controls className="bg-neutral-800 border-none rounded-lg overflow-hidden" />
+                <Controls className="bg-neutral-800 border-none rounded-lg overflow-hidden shadow-lg" />
               </ReactFlow>
             </section>
 
             <div className="flex justify-center">
               <button 
                 onClick={() => setResult(null)}
-                className="text-neutral-500 hover:text-white transition-colors flex items-center gap-2"
+                className="text-neutral-500 hover:text-white transition-colors flex items-center gap-2 bg-neutral-900/40 px-6 py-2 rounded-full border border-neutral-800"
               >
                 <Minus className="w-4 h-4" /> Reset Research Workspace
               </button>
