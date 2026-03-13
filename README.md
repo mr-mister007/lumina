@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🕯️ Lumina: The Cognitive Load Balancer
 
-## Getting Started
+**Lumina** is an innovative AI research hub designed to distill complexity into clarity. It solves the real-world problem of information overload by synthesizing multiple conflicting sources into a single "Unified Truth," highlighting "Tension Points" where sources disagree, and visualizing the data in an interactive Knowledge Graph.
 
-First, run the development server:
+## 🚀 The Problem & Solution
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**The Problem:** Modern research often involves managing dozens of open tabs, each with slightly different or even contradictory information. This lead to high cognitive load and analysis paralysis.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**The Solution:** Lumina acts as a cognitive filter:
+1.  **De-duplication:** Automatically merges redundant claims from different sources.
+2.  **Conflict Detection:** Flags "Tension Points" where sources provide conflicting data.
+3.  **Visual Synthesis:** Maps the relationships between claims in a dynamic Knowledge Graph using `react-flow`.
+4.  **Zen UI:** A distraction-free environment focused on clarity and synthesis.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   **Multi-Source Synthesis:** Paste snippets from various articles, papers, or notes.
+-   **Tension Point Alerts:** Immediate visibility into where your sources disagree.
+-   **Interactive Knowledge Graph:** Explore the connections between synthesized facts.
+-   **High-Speed AI Processing:** Powered by Gemini 2.5 Flash for rapid analysis.
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+-   **Frontend:** Next.js 16 (App Router), Tailwind CSS, Framer Motion
+-   **Visuals:** React Flow (Knowledge Graph), Lucide Icons
+-   **Backend:** Node.js API Routes
+-   **AI:** Google Gemini 2.5 Flash
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚦 Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Prerequisites
 
-## Deploy on Vercel
+-   Node.js 18+
+-   Google AI Studio API Key
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/mr-mister007/lumina.git
+    cd lumina
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Setup:**
+    Create a `.env.local` file:
+    ```env
+    GEMINI_API_KEY=your_gemini_api_key_here
+    ```
+
+4.  **Run Development Server:**
+    ```bash
+    npm run dev
+    ```
+
+---
+
+*Built for clarity in a world of noise.*
