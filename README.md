@@ -2,6 +2,8 @@
 
 **Lumina** is an innovative AI research hub designed to distill complexity into clarity. It solves the real-world problem of information overload by synthesizing multiple conflicting sources into a single "Unified Truth," highlighting "Tension Points" where sources disagree, and visualizing the data in an interactive Knowledge Graph.
 
+![Screeshot](https://github.com/mr-mister007/lumina/blob/main/src/Screenshot%20From%202026-03-13%2023-41-43.png)
+![Screeshot](https://github.com/mr-mister007/lumina/blob/main/src/Screenshot%20From%202026-03-13%2023-42-22.png)
 ## 🚀 The Problem & Solution
 
 **The Problem:** Modern research often involves managing dozens of open tabs, each with slightly different or even contradictory information. This lead to high cognitive load and analysis paralysis.
