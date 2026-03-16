@@ -29,6 +29,42 @@ export type LuminaResult = {
   graphEdges: any[];
 };
 
+export async function searchTopic(topic: string): Promise<Source[]> {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+  const model = genAI.getGenerativeModel({ 
+    model: MODEL_NAME,
+    tools: [
+      {
+        googleSearch: {},
+      } as any,
+    ],
+  });
+
+  const prompt = `Research the topic: "${topic}". 
+  Identify 3-5 distinct perspectives or sub-topics and provide a detailed summary for each.
+  Each source should be comprehensive enough for further analysis.
+  
+  Format the output as JSON:
+  {
+    "sources": [
+      { "name": "Source Name/Perspective", "content": "Detailed content..." }
+    ]
+  }`;
+
+  const res = await model.generateContent(prompt);
+  const responseText = res.response.text();
+  
+  // Clean up JSON if it contains markdown markers
+  const jsonStr = responseText.replace(/```json|```/g, "").trim();
+  const data = JSON.parse(jsonStr || "{\"sources\": []}");
+  
+  return (data.sources || []).map((s: any, idx: number) => ({
+    id: `search-${idx}`,
+    name: s.name,
+    content: s.content
+  }));
+}
+
 export async function processResearch(sources: Source[]): Promise<LuminaResult> {
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
