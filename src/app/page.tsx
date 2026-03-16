@@ -36,7 +36,9 @@ export default function Lumina() {
     { id: "1", name: "Source 1", content: "" },
     { id: "2", name: "Source 2", content: "" }
   ]);
+  const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isResearching, setIsResearching] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,6 +57,34 @@ export default function Lumina() {
 
   const updateSourceName = (id: string, name: string) => {
     setSources(sources.map(s => s.id === id ? { ...s, name } : s));
+  };
+
+  const researchTopic = async () => {
+    if (!topic.trim()) {
+      setError("Please enter a research topic.");
+      return;
+    }
+
+    setIsResearching(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const res = await fetch("/api/research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic }),
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      
+      setSources(data.sources);
+    } catch (err: any) {
+      setError(err.message || "An error occurred during research.");
+    } finally {
+      setIsResearching(false);
+    }
   };
 
   const analyze = async () => {
@@ -150,6 +180,45 @@ export default function Lumina() {
             Lumina merges multiple information sources, flags contradictions, and builds a unified knowledge graph.
           </p>
         </header>
+
+        {!result && (
+          <div className="max-w-3xl mx-auto mb-16">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative flex items-center bg-neutral-900/90 border border-neutral-800 p-2 rounded-full backdrop-blur-xl">
+                <Search className="w-6 h-6 text-neutral-500 ml-4" />
+                <input 
+                  type="text" 
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && researchTopic()}
+                  placeholder="Enter a topic to research autonomously (e.g., 'Impact of AI on creative writing')..."
+                  className="flex-1 bg-transparent border-none outline-none px-4 py-3 text-neutral-100 placeholder:text-neutral-600 font-medium"
+                />
+                <button
+                  onClick={researchTopic}
+                  disabled={isResearching}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold px-8 py-3 rounded-full transition-all disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isResearching ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Researching...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span>Explore</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+            <p className="text-center text-neutral-500 text-xs mt-4 uppercase tracking-widest font-semibold">
+              OR MANUALLY ADD SOURCES BELOW
+            </p>
+          </div>
+        )}
 
         {!result ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
