@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const MODEL_NAME = 'gemini-2.5-flash'; // Switching to stable 1.5 flash to avoid 2.5 quota issues
+const MODEL_NAME = 'gemini-2.5-flash'; // Using 2.5 flash as requested
 
 export type Source = {
   id: string;
@@ -27,6 +27,11 @@ export type LuminaResult = {
   tensionPoints: TensionPoint[];
   graphNodes: any[];
   graphEdges: any[];
+  comparison?: {
+    summary: string;
+    betterFor: { scenario: string; winner: string; reason: string }[];
+    verdict: string;
+  };
 };
 
 export async function searchTopic(topic: string): Promise<Source[]> {
@@ -40,7 +45,9 @@ export async function searchTopic(topic: string): Promise<Source[]> {
     ],
   });
 
-  const prompt = `Research the topic: "${topic}". 
+  const isComparison = / vs | versus | compare | comparison | better than /i.test(topic);
+
+  let prompt = `Research the topic: "${topic}". 
   Identify 3-5 distinct perspectives or sub-topics and provide a detailed summary for each.
   Each source should be comprehensive enough for further analysis.
   
@@ -50,6 +57,25 @@ export async function searchTopic(topic: string): Promise<Source[]> {
       { "name": "Source Name/Perspective", "content": "Detailed content..." }
     ]
   }`;
+
+  if (isComparison) {
+    prompt = `Perform a detailed comparison for: "${topic}".
+    Research both entities/topics thoroughly.
+    Identify:
+    1. Key differences and similarities.
+    2. Pros and cons of each.
+    3. Use cases where one is better than the other.
+    4. Expert opinions or community consensus.
+    
+    Provide 4-5 distinct perspectives (e.g., "Performance Comparison", "Ease of Use", "Ecosystem & Support", "Cost/Efficiency").
+    
+    Format the output as JSON:
+    {
+      "sources": [
+        { "name": "Comparison Aspect", "content": "Detailed comparative analysis..." }
+      ]
+    }`;
+  }
 
   const res = await model.generateContent(prompt);
   const responseText = res.response.text();
@@ -77,6 +103,7 @@ export async function processResearch(sources: Source[]): Promise<LuminaResult> 
 2. **De-duplicate:** If multiple sources make the same claim, merge them into a single "Master Claim."
 3. **Detect Tension Points:** Specifically identify where sources CONTRADICT each other (e.g., conflicting dates, differing numbers, opposing conclusions).
 4. **Build a Knowledge Graph:** Identify how claims connect (e.g., "Fact A is a cause of Fact B").
+5. **Comparison Analysis (IF APPLICABLE):** If the sources are comparing two or more things, provide a structured comparison summary.
 
 ### INPUT SOURCES:
 ${sourcesText}
@@ -97,6 +124,13 @@ Respond ONLY with a JSON object:
   "graph": {
     "nodes": [{"id": "string", "label": "string", "type": "claim|source"}],
     "edges": [{"source": "string", "target": "string", "label": "string"}]
+  },
+  "comparison": {
+    "summary": "string (overall comparison summary)",
+    "betterFor": [
+      { "scenario": "string (e.g. For beginners)", "winner": "string (name of the winner)", "reason": "string" }
+    ],
+    "verdict": "string (final recommendation/conclusion)"
   }
 }`;
 
@@ -119,6 +153,11 @@ Respond ONLY with a JSON object:
     masterClaims: rawData.masterClaims || [],
     tensionPoints: tensionPoints,
     graphNodes: rawData.graph?.nodes || [],
-    graphEdges: rawData.graph?.edges || []
+    graphEdges: rawData.graph?.edges || [],
+    comparison: rawData.comparison && rawData.comparison.summary ? {
+      summary: rawData.comparison.summary,
+      betterFor: Array.isArray(rawData.comparison.betterFor) ? rawData.comparison.betterFor : [],
+      verdict: rawData.comparison.verdict || "Analysis complete."
+    } : undefined
   };
 }

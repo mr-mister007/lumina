@@ -284,6 +284,55 @@ export default function Lumina() {
           </div>
         ) : (
           <div className="space-y-12 pb-24">
+            {/* Comparison Analysis Section */}
+            {result.comparison && (
+              <motion.section 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-neutral-900/40 border border-emerald-500/30 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-8 text-emerald-500/10">
+                  <GitBranch className="w-32 h-32" />
+                </div>
+                <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 text-emerald-400">
+                  <Brain className="w-6 h-6" />
+                  Comparison Analysis
+                </h3>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+                  <div className="lg:col-span-2 space-y-6">
+                    <p className="text-lg text-neutral-200 leading-relaxed font-medium">
+                      {result.comparison.summary}
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {result.comparison.betterFor.map((item: any, i: number) => (
+                        <div key={i} className="p-5 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 hover:border-emerald-500/30 transition-colors">
+                          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500 block mb-2">{item.scenario}</span>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm font-bold text-white bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/20">
+                              🏆 {item.winner}
+                            </span>
+                          </div>
+                          <p className="text-sm text-neutral-400 leading-relaxed">{item.reason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-neutral-950/80 border border-neutral-800 p-8 rounded-[2rem] flex flex-col justify-center shadow-inner relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-[2rem] blur opacity-0 group-hover:opacity-100 transition duration-1000"></div>
+                    <div className="relative">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 block mb-3">Lumina Verdict</span>
+                      <p className="text-base text-neutral-100 font-semibold leading-relaxed">
+                        {result.comparison.verdict}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.section>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Unified Truth Section */}
               <section className="bg-neutral-900/40 border border-neutral-800 rounded-[2.5rem] p-8 shadow-2xl overflow-hidden relative">
